@@ -1,16 +1,19 @@
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction } from "express";
+import { verifyJwt } from "../auth/jwt";
+import { reqUser } from "../types/Req";
 
-interface User {
-  name: string;
-  email: string;
-  id: string;
-}
-
-const checkUser = (req: Request, res: Response, next: NextFunction) => {
-  const user: User = req.body;
-  console.log("User data:", user);
-  if (!user || !user.name || !user.email || !user.id) {
-    res.status(400).json({ error: "Invalid user data" });
+const checkUser = async (req: reqUser, res: Response, next: NextFunction) => {
+  const {token} = req.cookies;
+  if (!token) {
+    res.status(401).json({ error: "Unauthorized access" });
+    return;
+  }
+  try {
+    const payload = await verifyJwt(token);
+    console.log("JWT payload:", payload);
+    req.user = payload; // Store the payload in the request object
+  } catch (error) {
+    res.status(401).json({ error: "Invalid token" });
     return;
   }
   next();
