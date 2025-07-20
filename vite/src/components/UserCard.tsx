@@ -8,12 +8,7 @@ interface UserCardProps {
   age?: number;
 }
 
-const UserCard: React.FC<UserCardProps> = ({
-  name,
-  email,
-  id,
-  usingUser,
-}) => {
+const UserCard: React.FC<UserCardProps> = ({ name, email, id, usingUser }) => {
   const [isLogin, setIsLogin] = useState(false);
   const [willLogin, setWillLogin] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -21,6 +16,7 @@ const UserCard: React.FC<UserCardProps> = ({
   const handleUseUser = useCallback(async () => {
     setLoading(true);
     try {
+      console.log("starting feth user");
       const response = await fetch("https://localhost:3000/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -40,7 +36,6 @@ const UserCard: React.FC<UserCardProps> = ({
   useEffect(() => {
     setIsLogin(Boolean(usingUser?.id === id));
   }, [usingUser, id]);
-
   return (
     <div className="flex flex-col gap-2 p-4 bg-white shadow-md rounded-lg">
       <h2 className="text-lg font-bold">{name}</h2>
@@ -56,9 +51,14 @@ const UserCard: React.FC<UserCardProps> = ({
         }`}
         onClick={handleUseUser}
         disabled={isLogin || loading}
-        aria-busy={loading}
-      >
-        {willLogin ? "Will login(reload)" : isLogin ? "In use" : loading ? "Using..." : "Use"}
+        aria-busy={loading}>
+        {willLogin
+          ? "Will login(reload)"
+          : isLogin
+          ? "In use"
+          : loading
+          ? "Using..."
+          : "Use"}
       </button>
     </div>
   );
